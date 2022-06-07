@@ -28,10 +28,12 @@ router.post(
       "password",
       "Please enter a password of minimum 8 characters!"
     ).isLength({ min: 8 }),
-    check("univId", "Please enter a 10 digit registration number!").isLength({
-      min: 10,
-      max: 10,
-    }),
+    check("univId", "Please enter your 12 digit registration number!").isLength(
+      {
+        min: 12,
+        max: 12,
+      }
+    ),
   ],
   async (req, res) => {
     const errors = validationResult(req);
