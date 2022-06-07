@@ -1,36 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { createProfile, getCurrentProfile } from '../../redux/profile/profile-actions';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { connect } from "react-redux";
+import {
+  createProfile,
+  getCurrentProfile,
+} from "../../redux/profile/profile-actions";
 
-import './form-profile.styles.scss';
+import {
+  Button,
+  Center,
+  createStyles,
+  Divider,
+  Grid,
+  Group,
+  MultiSelect,
+  Select,
+  Stack,
+  Textarea,
+  TextInput,
+  Title,
+} from "@mantine/core";
+import { useForm } from "@mantine/hooks";
 
 const initialState = {
-  company: '',
-  website: '',
-  location: '',
-  phone: '',
-  email: '',
-  status: '',
-  skills: '',
-  githubusername: '',
-  bio: '',
-  twitter: '',
-  facebook: '',
-  linkedin: '',
-  youtube: '',
-  instagram: ''
+  company: "",
+  website: "",
+  location: "",
+  phone: "",
+  email: "",
+  status: "",
+  skills: "",
+  githubusername: "",
+  bio: "",
+  twitter: "",
+  facebook: "",
+  linkedin: "",
+  youtube: "",
+  instagram: "",
 };
 
-const FormProfile = ({ profile: { profile, loading }, createProfile, getCurrentProfile, history }) => {
-  const [formData, setFormData] = useState(initialState);
+const useStyles = createStyles((theme) => ({
+  root: {
+    position: "relative",
+  },
 
-  const [displaySocialInputs, toggleSocialInputs] = useState(false);
+  input: {
+    height: "auto",
+    paddingTop: 18,
+  },
 
+  label: {
+    position: "absolute",
+    pointerEvents: "none",
+    fontSize: theme.fontSizes.xs,
+    paddingLeft: theme.spacing.sm,
+    paddingTop: theme.spacing.sm / 2,
+    zIndex: 1,
+  },
+}));
+
+const FormProfile = ({
+  auth: { user },
+  profile: { profile, loading },
+  createProfile,
+  getCurrentProfile,
+  history,
+}) => {
+  const navigate = useNavigate();
+
+  const form = useForm({
+    initialValues: {
+      ...initialState,
+      email: user.email,
+    },
+  });
   useEffect(() => {
-    if (!profile){
+    if (!profile) {
       getCurrentProfile();
-    } 
+    }
     if (!loading && profile) {
       const profileData = { ...initialState };
       // Check if there is a key for each element of profileData, if so it'll receive the value from redux(profile)
@@ -44,227 +91,170 @@ const FormProfile = ({ profile: { profile, loading }, createProfile, getCurrentP
       }
 
       //Check if is the obj is an array, if so it'll split the code by a comma.
-      if (Array.isArray(profileData.skills))
-        profileData.skills = profileData.skills.join(', ');
+      // if (Array.isArray(profileData.skills))
+      //   profileData.skills = profileData.skills.join(", ");
 
-    // updated inputs with profileData
-      setFormData(profileData);
+      // updated inputs with profileData
+      form.setValues(profileData);
+      setData(profileData.skills);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, getCurrentProfile, profile]);
 
-  const {
-    company,
-    website,
-    phone,
-    email,
-    location,
-    status,
-    skills,
-    githubusername,
-    bio,
-    twitter,
-    facebook,
-    linkedin,
-    youtube,
-    instagram
-  } = formData;
-
-  const onChange = e =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const onSubmit = e => {
-    e.preventDefault();
-    createProfile(formData, history, profile ? true : false);
-  };
+  const { classes } = useStyles();
+  const [data, setData] = useState([]);
 
   return (
-    <div className='main-container'>
-      {/*console.log('lol')*/}
-      <Link className="btn btn-light my-1 go-back" to="/dashboard">
-        &#8678; Return
-      </Link>
-      {profile ? <h1>Edit your profile</h1> : <h1>Create your profile</h1>}
-      <form onSubmit={onSubmit}>
-        
-        <div className='form-profile row justify-content-between'>
-          <div className='grid-input col-lg-5 '>
-            <select name="status" value={status} onChange={onChange}>
-              <option>Professional Status</option>
-              <option value="Student">Student</option>
-              <option value="Professor">Professor</option>
-              <option value="Developer">Developer</option>
-              <option value="Designer">Designer</option>
-              <option value="Engineer">Engineer</option>
-              <option value="Architect">Architect</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
+    <Center>
+      <Group position="center">
+        <Stack>
+          <Center mt={20}>
+            <Title order={2}>
+              {profile ? "Edit your profile" : "Create your profile"}
+            </Title>
+          </Center>
+          <Divider my="xs" label="Profile Details" />
+          <Center>
+            <form
+              onSubmit={form.onSubmit((values) => {
+                createProfile(values, history, profile ? true : false);
+                navigate(`/profile/${user._id}`);
+              })}
+            >
+              <Grid>
+                <Grid.Col xs={2}>
+                  <Select
+                    data={["Student", "Alumni"]}
+                    placeholder="Status"
+                    label="Status"
+                    classNames={classes}
+                    {...form.getInputProps("status")}
+                  />
+                </Grid.Col>
+                <Grid.Col xs={5}>
+                  <TextInput
+                    label="Company"
+                    placeholder="Your current company"
+                    classNames={classes}
+                    {...form.getInputProps("company")}
+                  />
+                </Grid.Col>
+                <Grid.Col xs={5}>
+                  <TextInput
+                    label="Website"
+                    placeholder="Your website link"
+                    classNames={classes}
+                    {...form.getInputProps("website")}
+                  />
+                </Grid.Col>
+                <Grid.Col xs={6}>
+                  <TextInput
+                    label="Location"
+                    placeholder="Your location"
+                    classNames={classes}
+                    {...form.getInputProps("location")}
+                  />
+                </Grid.Col>
+                <Grid.Col xs={2}>
+                  <TextInput
+                    label="Phone"
+                    placeholder="Your phone number"
+                    classNames={classes}
+                    {...form.getInputProps("phone")}
+                  />
+                </Grid.Col>
+                <Grid.Col xs={4}>
+                  <TextInput
+                    label="Email"
+                    placeholder="Your email"
+                    classNames={classes}
+                    {...form.getInputProps("email")}
+                  />
+                </Grid.Col>
+                <Grid.Col xs={12}>
+                  <MultiSelect
+                    label="Skills and Interests"
+                    data={data}
+                    placeholder="Select items"
+                    searchable
+                    creatable
+                    getCreateLabel={(query) => `+ Add ${query}`}
+                    onCreate={(query) =>
+                      setData((current) => [...current, query])
+                    }
+                    {...form.getInputProps("skills")}
+                  />
+                </Grid.Col>
+              </Grid>
+              <Divider my="xs" label="Social network handles" />
+              <Group position="center">
+                <TextInput
+                  label="LinkedIn"
+                  placeholder="Your LinkedIn URL"
+                  classNames={classes}
+                  {...form.getInputProps("linkedin")}
+                />
 
-          <div className='grid-input col-lg-5'>
-            <input
-              type="text"
-              placeholder="Company"
-              name="company"
-              value={company}
-              onChange={onChange}
-            />
-          </div>
+                <TextInput
+                  label="Twitter"
+                  placeholder="Your Twitter URL"
+                  classNames={classes}
+                  {...form.getInputProps("twitter")}
+                />
 
-          <div className='grid-input col-lg-5'>
-            <input
-              type="text"
-              placeholder="Website"
-              name="website"
-              value={website}
-              onChange={onChange}
-            />
+                <TextInput
+                  label="YouTube"
+                  placeholder="Your YouTube URL"
+                  classNames={classes}
+                  {...form.getInputProps("youtube")}
+                />
 
-          </div>
-          <div className='grid-input col-lg-5'>
-            <input
-              type="text"
-              placeholder="email"
-              name="email"
-              value={email}
-              onChange={onChange}
-            />  
-          </div>
+                <TextInput
+                  label="Facebook"
+                  placeholder="Your Facebook URL"
+                  classNames={classes}
+                  {...form.getInputProps("facebook")}
+                />
 
-          <div className='grid-input col-lg-5'>
-            <input
-              type="text"
-              placeholder="Phone"
-              name="phone"
-              value={phone}
-              onChange={onChange}
-            />
-          </div>
-
-          <div className='grid-input col-lg-5'>
-            <input
-              type="text"
-              placeholder="Locality"
-              name="location"
-              value={location}
-              onChange={onChange}
-            />
-          </div>
-
-          <div className='grid-input col-lg-5'>
-            <input
-              type="text"
-              placeholder="Skills"
-              name="skills"
-              value={skills}
-              onChange={onChange}
-            />
-          </div>
-
-          <div className='grid-input col-lg-5'>
-            <input
-              type="text"
-              placeholder="Github Username"
-              name="githubusername"
-              value={githubusername}
-              onChange={onChange}
-            />
-          </div>
-        
-        <div className='col-lg-5'>
-          <textarea
-              placeholder="Give a brief description about your professional life"
-              rows="7"
-              cols="37"
-              name="bio"
-              value={bio}
-              onChange={onChange}
-            />
-        </div>
-          
-        
-
-        <div className='col-lg-5'>
-          <button
-            className='btn btn-outline-info'
-            onClick={() => toggleSocialInputs(!displaySocialInputs)}
-            type="button"
-          >
-            Add Social Network Handles
-          </button>
-          {displaySocialInputs && (
-          <div>
-            <div className='social-network'>
-              <i className="fab fa-twitter fa-2x" />
-              <input
-                type="text"
-                placeholder="Twitter URL"
-                name="twitter"
-                value={twitter}
-                onChange={onChange}
+                <TextInput
+                  label="Instagram"
+                  placeholder="Your Instagram URL"
+                  classNames={classes}
+                  {...form.getInputProps("instagram")}
+                />
+              </Group>
+              <Divider my="xs" label="Bio" />
+              <Textarea
+                label="Bio"
+                placeholder="Tell us about yourself"
+                {...form.getInputProps("bio")}
               />
-            </div>
-
-            <div className='social-network'>
-              <i className="fab fa-facebook fa-2x" />
-              <input
-                type="text"
-                placeholder="Facebook URL"
-                name="facebook"
-                value={facebook}
-                onChange={onChange}
-              />
-            </div>
-
-            <div className='social-network'>
-              <i className="fab fa-youtube fa-2x" />
-              <input
-                type="text"
-                placeholder="YouTube URL"
-                name="youtube"
-                value={youtube}
-                onChange={onChange}
-              />
-            </div>
-
-            <div className='social-network'>
-              <i className="fab fa-linkedin fa-2x" />
-              <input
-                type="text"
-                placeholder="Linkedin URL"
-                name="linkedin"
-                value={linkedin}
-                onChange={onChange}
-              />
-            </div>
-
-            <div className='social-network'>
-              <i className="fab fa-instagram fa-2x" />
-              <input
-                type="text"
-                placeholder="Instagram URL"
-                name="instagram"
-                value={instagram}
-                onChange={onChange}
-              />
-            </div>
-          </div>
-        )}
-        </div>
-          
-        <div className='col-lg-8'>
-          <button className='button-send'>Submit</button>
-        </div>
-
-        </div>
-
-        
-      </form>
-    </div>
+              <Divider my="xs" label="Submit" />
+              <Group position="right">
+                <Button
+                  variant="outline"
+                  color="red"
+                  onClick={() => {
+                    navigate(`/profile/${user._id}`);
+                  }}
+                >
+                  Discard Changes
+                </Button>
+                <Button type="submit">Save Changes</Button>
+              </Group>
+            </form>
+          </Center>
+        </Stack>
+      </Group>
+    </Center>
   );
 };
 
-const mapStateToProps = state => ({
-  profile: state.profile
+const mapStateToProps = (state) => ({
+  profile: state.profile,
+  auth: state.user,
 });
 
-export default connect(mapStateToProps, { createProfile, getCurrentProfile })(FormProfile);
+export default connect(mapStateToProps, { createProfile, getCurrentProfile })(
+  FormProfile
+);

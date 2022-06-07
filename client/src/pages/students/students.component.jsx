@@ -7,6 +7,7 @@ import Spinner from "../../components/Spinner/Spinner.component";
 
 import { connect } from "react-redux";
 import { getProfiles } from "../../redux/profile/profile-actions";
+import { Search } from "tabler-icons-react";
 
 const SearchStudentsPage = ({
   getProfiles,
@@ -37,6 +38,7 @@ const SearchStudentsPage = ({
         <Center>
           <Stack>
             <Autocomplete
+              icon={<Search size={15} />}
               radius="xl"
               mt={30}
               width="50vw"

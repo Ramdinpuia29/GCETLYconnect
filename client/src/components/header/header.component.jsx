@@ -12,9 +12,21 @@ import {
   Switch,
   useMantineColorScheme,
   Drawer,
+  Menu,
+  Avatar,
+  UnstyledButton,
+  Divider,
+  Stack,
+  Button,
 } from "@mantine/core";
-import { Sun, MoonStars } from "tabler-icons-react";
-import { useBooleanToggle } from "@mantine/hooks";
+import {
+  Sun,
+  MoonStars,
+  ChevronDown,
+  Logout,
+  UserCircle,
+} from "tabler-icons-react";
+import { useBooleanToggle, useViewportSize } from "@mantine/hooks";
 
 import { logout } from "../../redux/user/user-actions";
 import { clearProfile } from "../../redux/profile/profile-actions";
@@ -98,6 +110,28 @@ const useStyles = createStyles((theme) => ({
           ? theme.colors.dark[6]
           : theme.colors.gray[0],
     },
+    userMenu: {
+      [theme.fn.smallerThan("xs")]: {
+        display: "none",
+      },
+    },
+    user: {
+      color: theme.white,
+      padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
+      borderRadius: theme.radius.sm,
+      transition: "background-color 100ms ease",
+
+      "&:hover": {
+        backgroundColor:
+          theme.colors[theme.primaryColor][
+            theme.colorScheme === "dark" ? 7 : 5
+          ],
+      },
+    },
+    userActive: {
+      backgroundColor:
+        theme.colors[theme.primaryColor][theme.colorScheme === "dark" ? 7 : 5],
+    },
   },
 
   linkActive: {
@@ -127,15 +161,17 @@ const guestLinks = [
 ];
 
 const HeaderLayout = ({
-  auth: { isAuthenticated, loading },
+  auth: { isAuthenticated, loading, user },
   logout,
   clearProfile,
 }) => {
   const navigate = useNavigate();
   const [opened, toggleOpened] = useBooleanToggle(false);
+  const [userMenuOpened, setUserMenuOpened] = useState(false);
   const [active, setActive] = useState(
     isAuthenticated ? authLinks[0].link : guestLinks[0].link
   );
+  const { width } = useViewportSize();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const { classes, cx } = useStyles();
 
@@ -201,17 +237,67 @@ const HeaderLayout = ({
             {!loading && (
               <>
                 {isAuthenticated ? (
-                  <Link
-                    to="/login"
-                    className={cx(classes.link)}
-                    onClick={() => {
-                      logout();
-                      clearProfile();
-                      navigate("/login");
-                    }}
-                  >
-                    Logout
-                  </Link>
+                  <>
+                    {width > 768 && (
+                      <Menu
+                        mr={20}
+                        size={260}
+                        placement="end"
+                        transition="pop-top-right"
+                        className={classes.userMenu}
+                        onClose={() => setUserMenuOpened(false)}
+                        onOpen={() => setUserMenuOpened(true)}
+                        control={
+                          <UnstyledButton
+                            className={cx(classes.user, {
+                              [classes.userActive]: userMenuOpened,
+                            })}
+                          >
+                            <Group spacing={7}>
+                              <Avatar
+                                src={user.avatar}
+                                alt={user.name}
+                                radius="xl"
+                                size={20}
+                              />
+                              <Text
+                                weight={500}
+                                size="sm"
+                                sx={{
+                                  lineHeight: 1,
+                                  color:
+                                    colorScheme === "dark" ? "white" : "black",
+                                }}
+                                mr={3}
+                              >
+                                {user.name}
+                              </Text>
+                              <ChevronDown size={12} />
+                            </Group>
+                          </UnstyledButton>
+                        }
+                      >
+                        <Menu.Item
+                          icon={<UserCircle size={14} />}
+                          onClick={() => {
+                            navigate(`/profile/${user._id}`);
+                          }}
+                        >
+                          My profile
+                        </Menu.Item>
+                        <Menu.Item
+                          icon={<Logout size={14} />}
+                          onClick={() => {
+                            logout();
+                            clearProfile();
+                            navigate("/login");
+                          }}
+                        >
+                          Logout
+                        </Menu.Item>
+                      </Menu>
+                    )}
+                  </>
                 ) : null}
               </>
             )}
@@ -235,13 +321,32 @@ const HeaderLayout = ({
         onClose={() => toggleOpened()}
         title={
           <Text weight={600} size="xl" color={"blue"}>
-            GCETLY<span style={{ color: "white" }}>connect</span>
+            GCETLY
+            <span style={{ color: colorScheme === "dark" ? "white" : "black" }}>
+              connect
+            </span>
           </Text>
         }
         padding="xl"
         size="md"
       >
-        {!loading && <>{isAuthenticated ? authItems : guestItems}</>}
+        <div style={{ marginTop: "40px" }}>
+          {!loading && <>{isAuthenticated ? authItems : guestItems}</>}
+          <Divider my="lg" />
+          <Stack>
+            <Button leftIcon={<UserCircle size={14} />}>My profile</Button>
+            <Button
+              leftIcon={<Logout size={14} />}
+              onClick={() => {
+                logout();
+                clearProfile();
+                navigate("/login");
+              }}
+            >
+              Logout
+            </Button>
+          </Stack>
+        </div>
       </Drawer>
     </>
   );

@@ -1,170 +1,217 @@
 import React, { useEffect, Fragment } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { connect } from "react-redux";
 
-import ProfileGithub from "../../components/profile-github/profile-github.component";
+import {
+  BrandFacebook,
+  BrandInstagram,
+  BrandLinkedin,
+  BrandTwitter,
+  BrandYoutube,
+  EditCircle,
+  View360,
+} from "tabler-icons-react";
+
 import Experience from "../../components/experience/experience.component";
 import Education from "../../components/education/education.component";
-import Spinner from "../../components/Spinner/Spinner.component";
 
 import { getProfileById } from "../../redux/profile/profile-actions";
 
-import "./student-profile.styles.scss";
-import { Avatar } from "@mantine/core";
+import {
+  Anchor,
+  Avatar,
+  Badge,
+  Blockquote,
+  Button,
+  Center,
+  Divider,
+  Grid,
+  Group,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { useViewportSize } from "@mantine/hooks";
 
-const StudentProfile = ({ getProfileById, profile: { profile }, match }) => {
+const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
   const { id } = useParams();
-
-  console.log(`ID is ${id}`);
-
   useEffect(() => {
     getProfileById(id);
   }, [getProfileById, id]);
 
-  return (
-    <div className="student-profile">
-      {profile === null ? (
-        <Spinner />
-      ) : (
-        <div>
-          <div className="profile-header">
-            <Link className="btn btn-light my-1 go-back" to="/students">
-              &#8678; Return
-            </Link>
-            <img src={profile.user.avatar} alt="" />
-            <Avatar src={profile.user.avatar} />
-            <h2 className="name">
-              {profile.user.name.charAt(0).toUpperCase() +
-                profile.user.name.slice(1)}
-            </h2>
-            <p className="status">{profile.status}</p>
-            <p className="location">{profile.location}</p>
+  const navigate = useNavigate();
+  const { width } = useViewportSize();
 
-            <Link className="button-styled" to={`/send-message/${id}`}>
-              Send Message
-            </Link>
-            <div className="links">
+  return (
+    <>
+      {profile === null ? (
+        <>
+          {/* <Spinner /> */}
+          <Center>
+            {
+              <Text>
+                You might have not create a profile yet. Click{" "}
+                <Link to="/create-profile">here</Link> to create.
+              </Text>
+            }
+          </Center>
+        </>
+      ) : (
+        <>
+          <Stack mx={40} my={20}>
+            <Group position="center">
+              <Avatar src={profile.user.avatar} radius={"50%"} size={200} />
+              <Stack>
+                <Title>
+                  {profile.user.name.charAt(0).toUpperCase() +
+                    profile.user.name.slice(1)}
+                </Title>
+                <Group>
+                  <Text>Works at {profile.company && profile.company}</Text>
+                </Group>
+                <Group>
+                  {profile.status && (
+                    <Badge color="blue" variant="dot" size="md">
+                      {profile.status}
+                    </Badge>
+                  )}
+                  {profile.location && (
+                    <Badge size="md">{profile.location}</Badge>
+                  )}
+                </Group>
+                {profile.bio && <Blockquote>{profile.bio}</Blockquote>}
+              </Stack>
+            </Group>
+            <Group mt={20} position="center">
               {profile.website && (
-                <a
-                  className="mx-2"
-                  href={profile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fas fa-globe fa-2x icon-web" />
-                </a>
+                <Anchor variant="link" href={profile.website} target="_blank">
+                  <View360 />
+                </Anchor>
               )}
-              {profile.social && profile.social.twitter && (
-                <a
-                  className="mx-2"
-                  href={profile.social.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-twitter fa-2x icon-tw" />
-                </a>
-              )}
-              {profile.social && profile.social.facebook && (
-                <a
-                  className="mx-2"
-                  href={profile.social.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-facebook fa-2x icon-fc" />
-                </a>
-              )}
-              {profile.social && profile.social.linkedin && (
-                <a
-                  className="mx-2"
+              {profile.social.linkedin && (
+                <Anchor
+                  variant="link"
                   href={profile.social.linkedin}
                   target="_blank"
-                  rel="noopener noreferrer"
                 >
-                  <i className="fab fa-linkedin fa-2x icon-lk" />
-                </a>
+                  <BrandLinkedin />
+                </Anchor>
               )}
-              {profile.social && profile.social.youtube && (
-                <a
-                  className="mx-2"
+              {profile.social.twitter && (
+                <Anchor
+                  variant="link"
+                  href={profile.social.twitter}
+                  target="_blank"
+                >
+                  <BrandTwitter />
+                </Anchor>
+              )}
+              {profile.social.youtube && (
+                <Anchor
+                  variant="link"
                   href={profile.social.youtube}
                   target="_blank"
-                  rel="noopener noreferrer"
                 >
-                  <i className="fab fa-youtube fa-2x icon-yt" />
-                </a>
+                  <BrandYoutube />
+                </Anchor>
               )}
-              {profile.social && profile.social.instagram && (
-                <a
-                  className="mx-2"
+              {profile.social.facebook && (
+                <Anchor
+                  variant="link"
+                  href={profile.social.facebook}
+                  target="_blank"
+                >
+                  <BrandFacebook />
+                </Anchor>
+              )}
+              {profile.social.instagram && (
+                <Anchor
+                  variant="link"
                   href={profile.social.instagram}
                   target="_blank"
-                  rel="noopener noreferrer"
                 >
-                  <i className="fab fa-instagram fa-2x icon-it" />
-                </a>
+                  <BrandInstagram />
+                </Anchor>
               )}
-            </div>
-          </div>
+            </Group>
 
-          <div className="row profile-top">
-            <div className="col-lg-6">
-              <h3>About</h3>
-              <p>{profile.bio}</p>
-            </div>
-
-            <div className="col-lg-6">
-              <h3>Skills </h3>
-              <div className="row mx-2 mb-3">
-                {profile.skills.map((skill, index) => (
-                  <span key={index} className="skill m-1">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="row profile-mid">
-            <div className="col-lg-6">
-              <h3>Experience</h3>
-              {profile.experience.length > 0 ? (
-                <Fragment>
-                  {profile.experience.map((experience) => (
-                    <Experience key={experience._id} experience={experience} />
-                  ))}
-                </Fragment>
-              ) : (
-                <h4>No experience credentials</h4>
+            <Group position="center">
+              {auth.user._id !== profile.user._id && (
+                <Button variant="outline" mt={20}>
+                  Message {profile.user.name}
+                </Button>
               )}
-            </div>
-
-            <div className="col-lg-6">
-              <h3>Education</h3>
-              {profile.education.length > 0 ? (
-                <Fragment>
-                  {profile.education.map((education) => (
-                    <Education key={education._id} education={education} />
-                  ))}
-                </Fragment>
-              ) : (
-                <h4>No education credentials</h4>
+            </Group>
+            <Group position="right">
+              {auth.user._id === profile.user._id && (
+                <Button
+                  variant="outline"
+                  mt={20}
+                  onClick={() => {
+                    navigate("/edit-profile");
+                  }}
+                >
+                  <EditCircle /> {width > 768 && "Edit profile"}
+                </Button>
               )}
-            </div>
-          </div>
+            </Group>
+            <Divider my="lg" size="md" />
+            <Grid>
+              <Grid.Col span={width > 768 ? 4 : 12}>
+                <Stack>
+                  <Title order={4}>Skills and Interests</Title>
+                  <Group>
+                    {profile.skills.map((skill) => (
+                      <Badge size="md" key={skill}>
+                        {skill}
+                      </Badge>
+                    ))}
+                  </Group>
+                </Stack>
+              </Grid.Col>
 
-          <div className="github-repos">
-            {profile.githubusername && (
-              <ProfileGithub username={profile.githubusername} />
-            )}
-          </div>
-        </div>
+              <Grid.Col span={width > 768 ? 4 : 12}>
+                <Title order={4}>Experiences</Title>
+                {profile.experience.length > 0 ? (
+                  <Fragment>
+                    {profile.experience.map((experience) => (
+                      <Experience
+                        key={experience._id}
+                        experience={experience}
+                        currentUser={auth.user._id}
+                      />
+                    ))}
+                  </Fragment>
+                ) : (
+                  <Text color="dimmed">No experience credentials</Text>
+                )}
+              </Grid.Col>
+              <Grid.Col span={width > 768 ? 4 : 12}>
+                <Title order={4}>Educations</Title>
+                {profile.education.length > 0 ? (
+                  <>
+                    {profile.education.map((education) => (
+                      <Education
+                        key={education._id}
+                        education={education}
+                        currentUser={auth.user._id}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <Text color="dimmed">No education credentials</Text>
+                )}
+              </Grid.Col>
+            </Grid>
+          </Stack>
+        </>
       )}
-    </div>
+    </>
   );
 };
 
 const mapStateToProps = (state) => ({
+  auth: state.user,
   profile: state.profile,
 });
 
