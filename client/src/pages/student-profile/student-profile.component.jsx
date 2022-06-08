@@ -1,5 +1,5 @@
 import React, { useEffect, Fragment } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { connect } from "react-redux";
 
 import {
@@ -34,10 +34,10 @@ import {
 import { useViewportSize } from "@mantine/hooks";
 
 const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
-  const { id } = useParams();
+  const params = useParams();
   useEffect(() => {
-    getProfileById(id);
-  }, [getProfileById, id]);
+    getProfileById(params.id);
+  }, [getProfileById, params]);
 
   const navigate = useNavigate();
   const { width } = useViewportSize();
@@ -51,7 +51,7 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
             {
               <Text>
                 You might have not create a profile yet. Click{" "}
-                <Link to="/create-profile">here</Link> to create.
+                <Anchor to="/create-profile">here</Anchor> to create.
               </Text>
             }
           </Center>
@@ -63,8 +63,10 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
               <Avatar src={profile.user.avatar} radius={"50%"} size={200} />
               <Stack>
                 <Title>
-                  {profile.user.name.charAt(0).toUpperCase() +
-                    profile.user.name.slice(1)}
+                  {profile.user
+                    ? profile.user.name.charAt(0).toUpperCase() +
+                      profile.user.name.slice(1)
+                    : ""}
                 </Title>
                 <Group>
                   <Text>Works at {profile.company && profile.company}</Text>
@@ -161,18 +163,19 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
                 <Stack>
                   <Title order={4}>Skills and Interests</Title>
                   <Group>
-                    {profile.skills.map((skill) => (
-                      <Badge size="md" key={skill}>
-                        {skill}
-                      </Badge>
-                    ))}
+                    {profile.skills &&
+                      profile.skills.map((skill) => (
+                        <Badge size="md" key={skill}>
+                          {skill}
+                        </Badge>
+                      ))}
                   </Group>
                 </Stack>
               </Grid.Col>
 
               <Grid.Col span={width > 768 ? 4 : 12}>
                 <Title order={4}>Experiences</Title>
-                {profile.experience.length > 0 ? (
+                {profile.experience && profile.experience.length > 0 ? (
                   <Fragment>
                     {profile.experience.map((experience) => (
                       <Experience

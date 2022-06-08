@@ -98,7 +98,7 @@ const App = () => {
             loader: "oval",
           }}
         >
-          <NotificationsProvider autoClose={10000}>
+          <NotificationsProvider autoClose={5000}>
             <Header />
             <Alert />
             <ErrorBoundary>
@@ -127,7 +127,6 @@ const App = () => {
                 <PrivateRoute
                   exact
                   path="/create-profile"
-                  component={FormProfile}
                   element={<FormProfile />}
                 />
                 <PrivateRoute

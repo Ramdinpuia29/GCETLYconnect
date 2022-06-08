@@ -42,7 +42,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const CreatePost = ({ auth }) => {
+const CreatePost = ({ auth: { user } }) => {
   const { classes } = useStyles();
 
   const navigate = useNavigate();
@@ -50,8 +50,8 @@ const CreatePost = ({ auth }) => {
   return (
     <Center>
       <div className={classes.container}>
-        <Link to={`/profile/${auth.user._id}`}>
-          <Avatar size={50} radius={50} mr={10} src={auth.user.avatar} />
+        <Link to={`/profile/${user ? user._id : ""}`}>
+          <Avatar size={50} radius={50} mr={10} src={user ? user.avatar : ""} />
         </Link>
 
         <Box className={classes.box} onClick={() => navigate("/createPost")}>

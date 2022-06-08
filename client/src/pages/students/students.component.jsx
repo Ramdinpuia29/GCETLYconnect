@@ -54,7 +54,7 @@ const SearchStudentsPage = ({
                 filteredProfiles.map((profile) => (
                   <Group spacing="xl">
                     {profile.user._id !== user._id ? (
-                      <StudentCard key={profile._id} profile={profile} />
+                      <StudentCard key={profile.email} profile={profile} />
                     ) : null}
                   </Group>
                 ))

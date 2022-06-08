@@ -119,7 +119,7 @@ const PostItem = ({
   removeLike,
   deletePost,
   auth,
-  post: { _id, title, text, name, avatar, user, likes, comments, date },
+  post: { loading, _id, title, text, avatar, user, likes, comments, date },
 }) => {
   // console.log(likes.find((like) => like.user === auth.user._id));
   const navigate = useNavigate();

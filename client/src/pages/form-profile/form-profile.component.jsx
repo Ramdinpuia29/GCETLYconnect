@@ -104,8 +104,13 @@ const FormProfile = ({
   const { classes } = useStyles();
   const [data, setData] = useState([]);
 
+  const handleSubmit = (values) => {
+    createProfile(values, history, profile ? true : false);
+    navigate(`/profile/${user._id}`);
+  };
+
   return (
-    <Center>
+    <Center px={40}>
       <Group position="center">
         <Stack>
           <Center mt={20}>
@@ -117,8 +122,7 @@ const FormProfile = ({
           <Center>
             <form
               onSubmit={form.onSubmit((values) => {
-                createProfile(values, history, profile ? true : false);
-                navigate(`/profile/${user._id}`);
+                handleSubmit(values);
               })}
             >
               <Grid>

@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
+
 import { login } from "../../redux/user/user-actions";
 
-import "./login.styles.scss";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { Check } from "tabler-icons-react";
+import { At, Check, Lock } from "tabler-icons-react";
+import {
+  PasswordInput,
+  TextInput,
+  Container,
+  Title,
+  Grid,
+  Stack,
+  Button,
+  Group,
+  Image,
+  Paper,
+} from "@mantine/core";
+import { useForm, useViewportSize } from "@mantine/hooks";
 
-const LoginPage = ({ login, user: { isAuthenticated } }) => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+const LoginPage = ({ login, user: { loading, isAuthenticated } }) => {
   const navigate = useNavigate();
 
-  const { email, password } = formData;
-
-  const onChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = ({ email, password }) => {
     login(email, password);
     showNotification({
       id: "login",
@@ -30,55 +31,74 @@ const LoginPage = ({ login, user: { isAuthenticated } }) => {
       message: "Logging in...",
     });
   };
-
-  // if (isAuthenticated) {
-  //   navigate("/posts");
-  // }
-
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/posts");
-
       updateNotification({
         icon: <Check />,
         id: "login",
         message: "Logged in",
       });
+
+      navigate("/posts");
     }
   }, [isAuthenticated, navigate]);
 
+  const form = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const { width } = useViewportSize();
+
   return (
-    <div className="container">
-      <div className="form-container">
-        <img src="./undraw_profile_pic_ic5t.svg" alt="" />
-        <h1>Welcome</h1>
-        <form onSubmit={onSubmit}>
-          <div>
-            <input
-              className="input-form"
-              type="email"
-              placeholder="Email"
-              name="email"
-              value={email}
-              onChange={onChange}
+    <Container>
+      <Grid mt={20}>
+        <Grid.Col span={width > 768 ? 4 : 12} sx={{ width: "100%" }}>
+          <Paper radius="md" withBorder p="md" sx={{ height: "100%" }}>
+            <Title>Login</Title>
+            <form
+              onSubmit={form.onSubmit((values) => {
+                onSubmit(values);
+              })}
+            >
+              <Stack>
+                <TextInput
+                  pt={20}
+                  label="Your email"
+                  placeholder="Your email"
+                  icon={<At size={14} />}
+                  {...form.getInputProps("email")}
+                  required
+                />
+
+                <PasswordInput
+                  label="Your password"
+                  placeholder="Your password"
+                  icon={<Lock size={16} />}
+                  {...form.getInputProps("password")}
+                  required
+                  minLength={8}
+                />
+              </Stack>
+              <Group mt={20} position="right">
+                <Button type="submit">LOGIN</Button>
+              </Group>
+            </form>
+          </Paper>
+        </Grid.Col>
+        {width >= 768 && (
+          <Grid.Col span={8}>
+            <Image
+              radius="md"
+              src="https://images.unsplash.com/photo-1455849318743-b2233052fcff"
+              alt="login-image"
             />
-          </div>
-          <div>
-            <input
-              className="input-form"
-              type="password"
-              placeholder="Password"
-              name="password"
-              value={password}
-              onChange={onChange}
-              minLength="8"
-            />
-          </div>
-          <div></div>
-          <button>LOGIN</button>
-        </form>
-      </div>
-    </div>
+          </Grid.Col>
+        )}
+      </Grid>
+    </Container>
   );
 };
 

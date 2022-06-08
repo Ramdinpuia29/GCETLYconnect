@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 
@@ -28,7 +28,7 @@ import {
 } from "tabler-icons-react";
 import { useBooleanToggle, useViewportSize } from "@mantine/hooks";
 
-import { logout } from "../../redux/user/user-actions";
+import { loadUser, logout } from "../../redux/user/user-actions";
 import { clearProfile } from "../../redux/profile/profile-actions";
 
 const useStyles = createStyles((theme) => ({
@@ -163,6 +163,7 @@ const guestLinks = [
 const HeaderLayout = ({
   auth: { isAuthenticated, loading, user },
   logout,
+  loadUser,
   clearProfile,
 }) => {
   const navigate = useNavigate();
@@ -174,6 +175,10 @@ const HeaderLayout = ({
   const { width } = useViewportSize();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const { classes, cx } = useStyles();
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
 
   const authItems = authLinks.map((link) => (
     <Link
@@ -255,8 +260,8 @@ const HeaderLayout = ({
                           >
                             <Group spacing={7}>
                               <Avatar
-                                src={user.avatar}
-                                alt={user.name}
+                                src={user ? user.avatar : ""}
+                                alt={user ? user.name : ""}
                                 radius="xl"
                                 size={20}
                               />
@@ -270,7 +275,7 @@ const HeaderLayout = ({
                                 }}
                                 mr={3}
                               >
-                                {user.name}
+                                {user ? user.name : ""}
                               </Text>
                               <ChevronDown size={12} />
                             </Group>
@@ -334,13 +339,22 @@ const HeaderLayout = ({
           {!loading && <>{isAuthenticated ? authItems : guestItems}</>}
           <Divider my="lg" />
           <Stack>
-            <Button leftIcon={<UserCircle size={14} />}>My profile</Button>
+            <Button
+              leftIcon={<UserCircle size={14} />}
+              onClick={() => {
+                navigate(`/profile/${user._id}`);
+                toggleOpened(false);
+              }}
+            >
+              My profile
+            </Button>
             <Button
               leftIcon={<Logout size={14} />}
               onClick={() => {
                 logout();
                 clearProfile();
                 navigate("/login");
+                toggleOpened(false);
               }}
             >
               Logout
@@ -356,4 +370,6 @@ const mapStateToProps = (state) => ({
   auth: state.user,
 });
 
-export default connect(mapStateToProps, { logout, clearProfile })(HeaderLayout);
+export default connect(mapStateToProps, { logout, clearProfile, loadUser })(
+  HeaderLayout
+);
