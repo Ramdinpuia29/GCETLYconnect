@@ -1,9 +1,9 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-import { Avatar, Text, Button, Paper, Badge, Group } from "@mantine/core";
+import { Avatar, Text, Button, Paper, Badge, Group } from '@mantine/core';
 
-import "./student-card.styles.scss";
+import './student-card.styles.scss';
 
 const StudentCard = ({
   profile: {
@@ -12,6 +12,7 @@ const StudentCard = ({
     company,
     location,
     skills,
+    mentoring,
   },
 }) => {
   return (
@@ -22,8 +23,8 @@ const StudentCard = ({
       m="sm"
       sx={(theme) => ({
         backgroundColor:
-          theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
-        width: "350px",
+          theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.white,
+        width: '350px',
       })}
     >
       <Avatar src={avatar} size={120} radius={120} mx="auto" />
@@ -31,10 +32,13 @@ const StudentCard = ({
         {name}
       </Text>
       <Text align="center" color="dimmed" size="sm">
-        {status} {company ? ` • ${company}` : null}{" "}
+        {status} {company ? ` • ${company}` : null}{' '}
         {location ? ` • ${location}` : null}
       </Text>
 
+      <Group mt="lg" position="center">
+        <Badge>{mentoring}</Badge>
+      </Group>
       <Group mt="lg" position="center">
         {skills.slice(0, 5).map((skill, index) => (
           <Badge key={index}>{skill}</Badge>
