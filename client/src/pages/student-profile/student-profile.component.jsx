@@ -1,6 +1,6 @@
-import React, { useEffect, Fragment } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { connect } from "react-redux";
+import React, { useEffect, Fragment } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import {
   BrandFacebook,
@@ -10,12 +10,12 @@ import {
   BrandYoutube,
   EditCircle,
   View360,
-} from "tabler-icons-react";
+} from 'tabler-icons-react';
 
-import Experience from "../../components/experience/experience.component";
-import Education from "../../components/education/education.component";
+import Experience from '../../components/experience/experience.component';
+import Education from '../../components/education/education.component';
 
-import { getProfileById } from "../../redux/profile/profile-actions";
+import { getProfileById } from '../../redux/profile/profile-actions';
 
 import {
   Anchor,
@@ -30,8 +30,8 @@ import {
   Stack,
   Text,
   Title,
-} from "@mantine/core";
-import { useViewportSize } from "@mantine/hooks";
+} from '@mantine/core';
+import { useViewportSize } from '@mantine/hooks';
 
 const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
   const params = useParams();
@@ -50,7 +50,7 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
           <Center>
             {
               <Text>
-                You might have not create a profile yet. Click{" "}
+                You might have not create a profile yet. Click{' '}
                 <Anchor to="/create-profile">here</Anchor> to create.
               </Text>
             }
@@ -60,13 +60,13 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
         <>
           <Stack mx={40} my={20}>
             <Group position="center">
-              <Avatar src={profile.user.avatar} radius={"50%"} size={200} />
+              <Avatar src={profile.user.avatar} radius={'50%'} size={200} />
               <Stack>
                 <Title>
                   {profile.user
                     ? profile.user.name.charAt(0).toUpperCase() +
                       profile.user.name.slice(1)
-                    : ""}
+                    : ''}
                 </Title>
                 <Group>
                   <Text>Works at {profile.company && profile.company}</Text>
@@ -79,6 +79,11 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
                   )}
                   {profile.location && (
                     <Badge size="md">{profile.location}</Badge>
+                  )}
+                </Group>
+                <Group>
+                  {profile.mentoring && (
+                    <Badge size="md">{profile.mentoring}</Badge>
                   )}
                 </Group>
                 {profile.bio && <Blockquote>{profile.bio}</Blockquote>}
@@ -139,7 +144,13 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
 
             <Group position="center">
               {auth.user._id !== profile.user._id && (
-                <Button variant="outline" mt={20}>
+                <Button
+                  variant="outline"
+                  mt={20}
+                  onClick={() => {
+                    navigate(`/send-message/${profile.user._id}`);
+                  }}
+                >
                   Message {profile.user.name}
                 </Button>
               )}
@@ -150,10 +161,10 @@ const StudentProfile = ({ getProfileById, auth, profile: { profile } }) => {
                   variant="outline"
                   mt={20}
                   onClick={() => {
-                    navigate("/edit-profile");
+                    navigate('/edit-profile');
                   }}
                 >
-                  <EditCircle /> {width > 768 && "Edit profile"}
+                  <EditCircle /> {width > 768 && 'Edit profile'}
                 </Button>
               )}
             </Group>
